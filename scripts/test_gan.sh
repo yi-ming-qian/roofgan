@@ -1,6 +1,6 @@
 python roofGAN.py --test \
-                    --ckpt 180000 \
+                    --ckpt 200000 \
                     --n_samples 1000 \
                     --data_root /local-scratch/yimingq/house/normalmap \
-                    --proj_dir  parallel \
-                    -g 1
+                    --proj_dir  roofgan \
+                    -g 0

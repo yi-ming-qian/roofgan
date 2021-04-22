@@ -82,10 +82,6 @@ class House(object):
             tb_angle_sin = math.sqrt(abs(1.-tb_angle_cos**2))
             lr_angle_sin = math.sqrt(abs(1.-lr_angle_cos**2))
 
-            # tb_angle = self.roof_angles[i,0] # top bottom
-            # tb_angle_sin, tb_angle_cos = math.sin(tb_angle), math.cos(tb_angle)
-            # lr_angle = self.roof_angles[i,1] # left right
-            # lr_angle_sin, lr_angle_cos = math.sin(lr_angle), math.cos(lr_angle)
             if btype == H_GABLE:
                 roof_normal[0,:] = [0., -tb_angle_sin, tb_angle_cos]
                 roof_normal[1,:] = [0., tb_angle_sin, tb_angle_cos]
@@ -152,10 +148,7 @@ class House(object):
         for i in range(self.num_blocks):
             to_rel_num[i] = np.sum(coli_label[:,i,:4])
             block_area[i] = abs((self.founda_positions[i,1]-self.founda_positions[i,0])*(self.founda_positions[i,3]-self.founda_positions[i,2]))
-        #block_order = np.argsort(-to_rel_num) # you many consider foundation area
-        #block_order = np.lexsort((block_area,to_rel_num))[::-1]
         block_order = np.lexsort((to_rel_num, block_area))[::-1]
-        #block_order = np.arange(self.num_blocks)
 
         roof_indicators = np.full_like(self.founda_positions, True, dtype=np.bool)
         roof_updated = np.full_like(self.founda_positions, False, dtype=np.bool)
@@ -185,20 +178,17 @@ class House(object):
                         break
                     mid_pos = (self.founda_positions[j,f] + self.founda_positions[j,symid])/2.
                     if coli_label[i,j,f] or abs(self.founda_positions[i,f]-self.founda_positions[j,f])<T_boundary:
-                    #if (coli_label[i,j,f] or abs(self.founda_positions[i,f]-self.founda_positions[j,f])<T_boundary) and abs(self.founda_positions[i,f]-self.founda_positions[j,f])<7:
-                    #if coli_label[i,j,f]:
+                    
                         gap = self.founda_positions[j,f]-self.founda_positions[i,f]
                         self.founda_positions[i,f] = self.founda_positions[j,f]
-                        # if btype>1:
-                        #     self.founda_positions[i,symid] += gap
+                        
                         founda_updated[i,f] = True
                         if abs(self.roof_heights[i]-self.roof_heights[j])/self.roof_heights[i] < T_height:
                             self.roof_heights[i] = self.roof_heights[j]
                     elif middles[j,f]>0.0 and abs(self.founda_positions[i,f]-middles[j,f])<T_middle and ((btype+self.block_types[j])%2)!=0:
                         gap = mid_pos - self.founda_positions[i,f]
                         self.founda_positions[i,f] = mid_pos
-                        # if btype>1:
-                        #     self.founda_positions[i,symid] += gap
+                        
                         founda_updated[i,f] = True
                         if abs(self.roof_heights[i]-self.roof_heights[j])/self.roof_heights[i] < T_height:
                             self.roof_heights[i] = self.roof_heights[j]
@@ -207,7 +197,6 @@ class House(object):
                 
                     if (np.dot(self.roof_normals[i,f],self.roof_normals[j,f])>T_angle or coli_label[i,j,int(f/2)+4]) and abs(self.founda_positions[i,f]-self.founda_positions[j,f])<T_boundary:
                         self.roof_normals[i,f] = self.roof_normals[j,f].copy()
-                        #self.founda_positions[i,f] = self.founda_positions[j,f]
                         self.roof_normals[i,symid] = self.roof_normals[j,symid].copy()
                         roof_updated[i,f] = True
                         roof_updated[i,symid] = True
@@ -224,7 +213,8 @@ class House(object):
 
         if btype == H_GABLE:
             if founda_updated[i,0]==True and founda_updated[i,1]==True:
-                print(str(H_GABLE)+": both top and bottom boundaries are fixed")
+                pass
+                #print(str(H_GABLE)+": both top and bottom boundaries are fixed")
             elif founda_updated[i,0]==True and founda_updated[i,1]==False:
                 point = np.array([xmin*pixel_step, ymin*pixel_step, self.founda_height])
                 ymiddle = update_founda_h(self.roof_normals[i,0], point, xmin, self.roof_heights[i])
@@ -236,7 +226,8 @@ class House(object):
 
         elif btype == V_GABLE:
             if founda_updated[i,2]==True and founda_updated[i,3]==True:
-                print(str(V_GABLE)+": both left and right boundaries are fixed")
+                pass
+                #print(str(V_GABLE)+": both left and right boundaries are fixed")
             elif founda_updated[i,2]==True and founda_updated[i,3]==False:
                 point = np.array([xmin*pixel_step, ymin*pixel_step, self.founda_height])
                 xmiddle = update_founda_v(self.roof_normals[i,2], point, ymin, self.roof_heights[i])
@@ -247,7 +238,8 @@ class House(object):
                 self.founda_positions[i,2] = 2.0*xmiddle-xmax
         elif btype == H_HIP:
             if founda_updated[i,0]==True and founda_updated[i,1]==True:
-                print(str(H_HIP)+": both top and bottom boundaries are fixed")
+                pass
+                #print(str(H_HIP)+": both top and bottom boundaries are fixed")
             elif founda_updated[i,0]==True and founda_updated[i,1]==False:
                 point = np.array([xmin*pixel_step, ymin*pixel_step, self.founda_height])
                 ymiddle = update_founda_h(self.roof_normals[i,0], point, xmin, self.roof_heights[i])
@@ -262,7 +254,8 @@ class House(object):
             self.roof_ratios[i] = max(0,min(0.499,(xtmp-xmin)/(xmax-xmin)))
         elif btype == V_HIP:
             if founda_updated[i,2]==True and founda_updated[i,3]==True:
-                print(str(V_HIP)+": both left and right boundaries are fixed")
+                pass
+                #print(str(V_HIP)+": both left and right boundaries are fixed")
             elif founda_updated[i,2]==True and founda_updated[i,3]==False:
                 point = np.array([xmin*pixel_step, ymin*pixel_step, self.founda_height])
                 xmiddle = update_founda_v(self.roof_normals[i,2], point, ymin, self.roof_heights[i])
@@ -533,17 +526,7 @@ class House(object):
         final_normal = (final_normal+1.)/2.
         final_normal = final_normal.reshape(64,64,3)*255.
         final_normal = final_normal[:, :, ::-1]
-        # if height is too close, treat it as one
-        # height_map1 = height_map.copy()
-        # height_map1[minid, np.arange(4096)] = -1000.
-        # secondid = np.argmax(height_map1, axis=0)
-        # first_height = height_map[minid, np.arange(4096)]
-        # second_height = height_map[secondid, np.arange(4096)]
-        # temp_id = np.minimum(minid, secondid)
-        # close_flag = abs(first_height-second_height)<1e-4
-        # minid[close_flag] = temp_id[close_flag]
-
-        #self.roof_graph = self.build_roof_graph()
+        
         face_labelmap = label_map[minid,np.arange(4096)]
         face_labelmap = self.combine_faces(face_labelmap, self.roof_graph)
         face_color = self.face_label2color(face_labelmap)

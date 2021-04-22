@@ -52,19 +52,6 @@ class HouseDataset(Dataset):
                 raise NotImplementedError
             all_paths = all_paths[flag]
 
-        # if phase == "train":
-        #     assert len(all_paths)==len(num_blocks)
-        #     u_bnum, u_counts = np.unique(num_blocks, return_counts=True)
-        #     max_count = np.amax(u_counts)
-        #     extend_path = []
-        #     for bnum, count in zip(u_bnum, u_counts):
-        #         if count==max_count or count<10:
-        #             continue
-        #         s = max(int((max_count-count)/count), 2)
-        #         extend_path.append(np.tile(all_paths[num_blocks==bnum], s))
-        #     extend_path = np.concatenate(extend_path)
-        #     #print(extend_path.shape)
-        #     all_paths = np.concatenate([all_paths, extend_path])
         self.all_paths = all_paths
         
 
@@ -140,13 +127,6 @@ class HouseDataset(Dataset):
         founda_positions[:,2:4] += 31.5-(left_bound+right_bound)/2.
 
         house = House(block_types, founda_positions, founda_height, roof_angles)
-        ############saving gt
-        # house.save_to_mesh(f"./experiments/gt_test/{index}_gt.obj")
-        # height_map, face_masks, normal_img = house.rasterize_house(scale_flag=False)
-        # np.savez(f'./experiments/gt_test/{index}_gt.npz', height_map=height_map, face_masks=face_masks)
-        # cv2.imwrite(f"./experiments/gt_test/{index}_gt.png", normal_img)
-        # return
-        ### don't forget to turn on self.roof_graph = self.build_roof_graph() in house.py
 
         # check relationship
         middles = np.full_like(founda_positions, -1.)
@@ -169,14 +149,6 @@ class HouseDataset(Dataset):
                 colinear_onehots.append(tmp_label)
         colinear_onehots = np.asarray(colinear_onehots)
         
-        #print(edgeg_node.shape, edgeg_edge.shape, num_blocks*(num_blocks-1)*(num_blocks-2), num_blocks)
-
-        # foundation masks
-        # founda_masks = np.zeros((num_blocks,64,64))
-        # for i in range(num_blocks):
-        #     top, bottom, left, right = (founda_positions[i,:]+0.5).astype(np.int)
-        #     founda_masks[i, top:min(64,bottom+1), left:min(64,right+1)] = 1.
-
         # roof
         roof_onehot_maps = np.zeros((num_blocks,3,32,32))
         roof_angle_maps = np.zeros((num_blocks,32,32))
@@ -186,9 +158,6 @@ class HouseDataset(Dataset):
             t_angle = cv2.resize(t_angle, (32,32))
             t_onehot = np.transpose(t_onehot, (2,0,1))
             roof_onehot_maps[i], roof_angle_maps[i] = t_onehot, t_angle
-
-        
-
 
         sample = {
             "path": path,
@@ -210,29 +179,8 @@ def pad_collate_fn_for_dict(batch):
     founda_height = [d['founda_height'] for d in batch]
     name_batch = [d['path'] for d in batch]
 
-    # block_idx = []
-    # offset = 0
-    # for n in n_parts_batch:
-    #     block_idx.append([offset, offset+n])
-    #     offset += n
-
-    # pair_idx = []
-    # offset = 0
-    # for n in n_parts_batch:
-    #     t = int(n*(n-1)/2)
-    #     pair_idx.append([offset, offset+t])
-    #     offset += t
-
     colinear_onehots = [d['colinear_onehots'] for d in batch]
     colinear_onehots = torch.cat(colinear_onehots, dim=0)
-
-    # edgeg_node = [d['edgeg_node'] for d in batch]
-    # edgeg_node = torch.cat(edgeg_node, dim=0)
-    # blockg_edge = [d['blockg_edge'] for d in batch]
-    # blockg_edge = torch.cat(blockg_edge, dim=0)
-    # edgeg_edge = [d['edgeg_edge'] for d in batch]
-    # edgeg_edge = torch.cat(edgeg_edge, dim=0)
-
 
     roof_onehot_maps = [d['roof_onehot_maps'] for d in batch]
     roof_onehot_maps = torch.cat(roof_onehot_maps, dim=0)
@@ -245,10 +193,7 @@ def pad_collate_fn_for_dict(batch):
             "founda_height": founda_height,
             "roof_onehot_maps": roof_onehot_maps,
             "roof_angle_maps": roof_angle_maps,
-            "colinear_onehots": colinear_onehots,
-            # "blockg_edge": blockg_edge,
-            # "edgeg_edge": edgeg_edge,
-            # "edgeg_node": edgeg_node
+            "colinear_onehots": colinear_onehots
             }
 
 

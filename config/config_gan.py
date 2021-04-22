@@ -5,7 +5,7 @@ import argparse
 from util.utils import ensure_dirs
 
 
-class LatentGANConfig(object):
+class RoofGANConfig(object):
     """Base class of Config, provide necessary hyperparameters.
     """
 
@@ -23,14 +23,12 @@ class LatentGANConfig(object):
             self.__setattr__(k, v)
 
         # experiment paths
-        if self.exp_name is None:
-            self.exp_name = "pqnet-PartNet-{}".format(args.category)
         if args.exclude==0:
             self.exp_dir = os.path.join('experiments', args.proj_dir)
         else:
             self.exp_dir = os.path.join('experiments', args.proj_dir+'-'+str(args.exclude))
-        self.log_dir = os.path.join(self.exp_dir, 'log_{}'.format('lgan'))
-        self.model_dir = os.path.join(self.exp_dir, 'model_{}'.format('lgan'))
+        self.log_dir = os.path.join(self.exp_dir, 'log_{}'.format('gan'))
+        self.model_dir = os.path.join(self.exp_dir, 'model_{}'.format('gan'))
 
         if phase == "train" and args.cont is not True and os.path.exists(self.log_dir):
             response = input('Experiment log/model already exists, overwrite to retrain? (y/n) ')
@@ -84,10 +82,8 @@ class LatentGANConfig(object):
     def _add_basic_config_(self, parser):
         """add general hyperparameters"""
         group = parser.add_argument_group('basic')
-        group.add_argument('--proj_dir', type=str, default="proj_log1",
+        group.add_argument('--proj_dir', type=str, default="roof_gan",
                            help="path to project folder where experiment logs/models will be saved")
-        group.add_argument('--exp_name', type=str, default=None, help="name of this experiment. "
-                           "Automatically generated based on data category if not provided.")
         group.add_argument('-g', '--gpu_ids', type=str, default="0",
                            help="gpu to use, e.g. 0  0,1,2. CPU not supported.")
 
@@ -100,8 +96,6 @@ class LatentGANConfig(object):
         """add hyperparameters for dataset configuration"""
         group = parser.add_argument_group('dataset')
         group.add_argument('--data_root', type=str, help="file path to data", required=True)
-        group.add_argument('--category', type=str, default="Chair", choices=['Chair', 'Table', 'Lamp'],
-                           help="shape category name")
         group.add_argument('--num_workers', type=int, default=8, help="number of workers for data loading")
         group.add_argument('--exclude', type=int, default=0, help="exclude block number for training")
 

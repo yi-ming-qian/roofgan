@@ -3,5 +3,5 @@ python roofGAN.py --train \
                     --critic_iters 1 \
                     --n_iters 200000 \
                     --batch_size 16 \
-                    --proj_dir parallel \
-                    -g 1
+                    --proj_dir roofgan \
+                    -g 0

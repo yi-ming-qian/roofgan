@@ -9,9 +9,6 @@ def get_dataloader(phase, config, use_all_points=False, is_shuffle=None):
 
     if config.module == 'house' or config.module == 'lvae' or config.module == "houseplus":
         dataset = HouseDataset(phase, config.data_root, config.exclude)
-        # for i in range(10):
-        #     dataset[i]
-        # exit()
         dataloader = DataLoader(dataset, batch_size=config.batch_size, shuffle=is_shuffle,
                                 num_workers=config.num_workers, collate_fn=pad_collate_fn_for_dict_house)
     else:

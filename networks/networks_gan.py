@@ -212,8 +212,6 @@ class Generator(nn.Module):
         onehots_ds = torch.cat([onehots02, onehots23],1)
         angles_ds = F.grid_sample(angles, grid, padding_mode="zeros", mode="bilinear")
 
-        # tmp = self.get_boundary(1-onehots[:,2:3,:,:])
-        # print((tmp+1)/2*31)
         return onehots_ds, angles_ds
 
 
@@ -230,8 +228,6 @@ class Generator(nn.Module):
         onehot = self.softmax(onehot)
         angle = self.angle(x)
         angle = torch.sigmoid(angle)
-        #colinear = self.colinear(onehot[:,2:3,:,:], num_blocks, edgeg_node)
-        #colinear = self.colinear(torch.cat([onehot,angle],1), num_blocks, edgeg_node)
         colinear = self.colinear(x, num_blocks)
         onehot_ds, angle_ds = self.ds(onehot, angle, colinear[:,:4], num_blocks)
 
@@ -331,7 +327,6 @@ class Discriminator(nn.Module):
         z = self.d2_coli(colinear_ohots).view(colinear_ohots.size(0),4,32,32)
         y = torch.cat([z,y],1)
         output1 = self.D1(x, num_blocks)
-        #x2 = torch.cat([roof_onehots, roof_angles],1)
         x2 = torch.cat([roof_onehots, roof_angles, roof_onehots_no, roof_angles_no],1)
         output2 = self.D2(x2, y, num_blocks)
         batch_size = len(num_blocks)
@@ -378,13 +373,3 @@ def prepare_graph(max_n=7):
         edgeg_edge = np.concatenate(edgeg_edge)
         edgeg_edges.append(torch.LongTensor(edgeg_edge))
     return blockg_edges, blockg_to_edgegs, edgeg_nodes, edgeg_edges
-
-# custom weights initialization called on netG and netD
-def weights_init(m):
-    classname = m.__class__.__name__
-    if classname.find('Linear') != -1:
-        m.weight.data.normal_(0.0, 0.02)
-        m.bias.data.fill_(0)
-    elif classname.find('BatchNorm') != -1:
-        m.weight.data.normal_(1.0, 0.02)
-        m.bias.data.fill_(0)

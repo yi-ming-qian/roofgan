@@ -1,4 +1,4 @@
-from networks.networks_lgan import Generator, Discriminator
+from networks.networks_gan import Generator, Discriminator
 
 
 def get_network(name, config):

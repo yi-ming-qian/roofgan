@@ -144,7 +144,7 @@ class WGANAgant(object):
             # (1) Update D network
             ###########################
             for p in self.netD.parameters():  # reset requires_grad
-                p.requires_grad = True  # they are set to False below in netG update
+                p.requires_grad = True
 
             for iter_d in range(self.critic_iters):
                 real_data = next(data)
@@ -170,22 +170,6 @@ class WGANAgant(object):
                     f_roof_onehots_no.detach(), f_roof_angles_no.detach())
                 D_fake = D_fake.mean()
                 D_fake.backward(one)
-
-                # # sanity check
-                # r_roof_onehots = torch.ones(2,3,32,32).cuda()
-                # r_roof_onehots[0,2,10:20,14:28] = 0.
-                # r_roof_onehots[1,2,5:24,9:32] = 0.
-                # r_roof_angles = torch.randn(2,1,32,32).cuda()
-                # r_coli_onehots = torch.FloatTensor([0,0.4,1,1]).view(1,4).cuda()
-                # num_blocks = torch.LongTensor([2])
-                # onehot1, roofangle1 = self.netG.ds(r_roof_onehots, r_roof_angles, r_coli_onehots, num_blocks)
-                # print(torch.mean(torch.abs(onehot1-r_roof_onehots)), torch.mean(torch.abs(roofangle1-r_roof_angles)))
-                # for i in range(onehot1.size(0)):
-                #     tmp1 = 1-onehot1[i,2].detach().cpu().numpy()
-                #     tmp2 = 1-r_roof_onehots[i,2].detach().cpu().numpy()
-                #     cv2.imwrite(f"./experiments/sanity/{i}_0.png",tmp1*255)
-                #     cv2.imwrite(f"./experiments/sanity/{i}_1.png",tmp2*255)
-                # exit()
 
                 # train with gradient penalty
                 gradient_penalty = self.calc_gradient_penalty(self.netD, r_roof_onehots, r_roof_angles, r_coli_onehots,
@@ -225,36 +209,10 @@ class WGANAgant(object):
             if self.clock.step % self.save_frequency == 0:
                 self.save_ckpt()
 
-# testing
-    def generate_Gt(self, config):
-        #np.random.seed(0)
-        #torch.manual_seed(0)
-        """generate samples"""
-        self.eval()
-        save_dir = os.path.join(config.exp_dir, "results/gt")
-        ensure_dir(save_dir)
-
-        dataset = HouseDataset('evl', config.data_root, config.max_n_parts)
-        train_loader = DataLoader(dataset, batch_size=1, shuffle=False,
-                                  num_workers=0, collate_fn=pad_collate_fn_for_dict_house)
-        for i, real_data in enumerate(train_loader):
-            with torch.no_grad():
-                r_roof_onehots = real_data["roof_onehot_maps"].cpu().numpy()
-                r_roof_angles = real_data["roof_angle_maps"].squeeze(1).cpu().numpy()
-                r_coli_onehots = real_data["colinear_onehots"].cpu().numpy()
-                num_blocks = real_data["num_blocks"]
-                blockg_edge = real_data["blockg_edge"]
-                edgeg_node = real_data["edgeg_node"]
-            
-                # print(np.sum(r_roof_onehots[0,2]), np.sum(r_roof_onehots[num_blocks.item()-1,2]))
-                # print(r_coli_onehots)
-                # exit()
-                self.parse_block(r_roof_onehots, r_roof_angles, r_coli_onehots, edgeg_node.numpy(), save_dir+f"/{i}")
-        exit()
     def generate(self, config):
-        np.random.seed(0)
-        torch.manual_seed(0)
-        """generate samples"""
+        # np.random.seed(0)
+        # torch.manual_seed(0)
+        
         self.eval()
         save_dir = os.path.join(config.exp_dir, "results/ckpt-{}-num-{}".format(config.ckpt, config.n_samples))
         ensure_dir(save_dir)
@@ -263,9 +221,9 @@ class WGANAgant(object):
         distribution = distribution/np.sum(distribution)
         n_blocks = np.random.choice(np.arange(2,6), config.n_samples, p=distribution)
         blockg_edges, edgeg_nodes, edgeg_edges = self.prepare_input(7)
-        scores = np.zeros(config.n_samples)
-        for i in range(config.n_samples):
-            print(i)
+
+        for i in tqdm(range(config.n_samples)):
+            #print(i)
             valid = False
             while valid==False:
                 block_num = n_blocks[i] if config.exclude==0 else config.exclude#np.random.randint(2,high=7)
@@ -275,18 +233,11 @@ class WGANAgant(object):
                 edgeg_edge = edgeg_edges[block_num]
                 with torch.no_grad():
                     f_roof_onehots, f_roof_angles, f_coli_onehots, _, _ = self.netG(noise, torch.LongTensor([block_num]))
-                    # _, score = self.netD(f_roof_onehots, f_roof_angles, f_coli_onehots, 
-                    #             torch.LongTensor([block_num]), blockg_edge, edgeg_node, edgeg_edge)
-                    # scores[i] = score.item()
                     f_roof_onehots = f_roof_onehots.cpu().numpy()
                     f_roof_angles = f_roof_angles.squeeze(1).cpu().numpy()
                     f_coli_onehots = f_coli_onehots.cpu().numpy()
                     valid = self.parse_block(f_roof_onehots, f_roof_angles, f_coli_onehots, edgeg_node.numpy(), save_dir+f"/{i}", i)
-                    # if i==5:
-                    #     print(f_coli_onehots)
-                    #     exit()
-        np.save(save_dir+"/score.npy", scores)
-        exit()
+
 
     def parse_block(self, roof_onehots_map1, roof_angles_map1, coli_onehots, edgeg_node, save_dir, fileid):
         
@@ -340,7 +291,7 @@ class WGANAgant(object):
                 lr_angle = np.mean(lr_angle_m[lr_mask])
             roof_angles.append([tb_angle, lr_angle])
 
-        imageio.mimsave(save_dir+"_blocks.gif", tmp_gifs, duration=1)
+        #imageio.mimsave(save_dir+"_blocks.gif", tmp_gifs, duration=1)
         block_types = np.asarray(block_types)
         founda_masks = np.asarray(founda_masks)
         roof_angles = np.asarray(roof_angles)
@@ -349,19 +300,6 @@ class WGANAgant(object):
         if house.num_blocks<=1:
             return False
         n_blocks_save = np.array([house.num_blocks])
-        height_map, face_masks, segment_img, normal_img = house.rasterize_house(scale_flag=True)
-        cv2.imwrite(save_dir+"_raw.png", segment_img)
-        cv2.imwrite(save_dir+"_normal_raw.png", normal_img)
-        np.savez(save_dir + f'_raw.npz', height_map=height_map, face_masks=face_masks, num_blocks=n_blocks_save)
-        ######### sequential snapping
-        house = House(block_types.copy(), founda_masks.copy(), 2., roof_angles.copy())
-        house.sequential_snap()
-        height_map, face_masks, segment_img, normal_img = house.rasterize_house(scale_flag=True)
-        cv2.imwrite(save_dir+"_thres.png", segment_img)
-        cv2.imwrite(save_dir+"_normal_thres.png", normal_img)
-        np.savez(save_dir + f'_thres.npz', height_map=height_map, face_masks=face_masks, num_blocks=n_blocks_save)
-        # if fileid==518:
-        #     house.save_to_mesh("./experiments/a.obj")
         ######### graph snapping
         coli_onehots = coli_onehots>0.5
         coli_binary = np.full((block_num, block_num, 6), False, dtype=np.bool)
@@ -375,15 +313,9 @@ class WGANAgant(object):
         height_map, face_masks, segment_img, normal_img = house.rasterize_house(scale_flag=True)
         cv2.imwrite(save_dir+"_graph.png", segment_img)
         cv2.imwrite(save_dir+"_normal_graph.png", normal_img)
-        np.savez(save_dir + f'_graph.npz', height_map=height_map, face_masks=face_masks, num_blocks=n_blocks_save)
+        #np.savez(save_dir + f'_graph.npz', height_map=height_map, face_masks=face_masks, num_blocks=n_blocks_save)
         house.save_to_mesh(save_dir+"_graph.obj")
-        # if fileid==8:
-        #     house.save_to_mesh("./experiments/b.obj")
-        #     exit()
-
         
-        # if fileid==7:
-        #     exit()
         return True
         
     def prepare_input(self, max_n):

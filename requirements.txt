@@ -1,5 +1,4 @@
-h5py==2.10.0
-Pillow==7.0.0
-tensorboardX==1.7
-tqdm==4.42.1
-pyrender==0.1.32 
+tensorboardX
+tqdm
+pyrender
+imageio
