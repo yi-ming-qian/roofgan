@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ```
 
 ## Dataset
-Please download our dataset from [here](https://www.dropbox.com/s/qxt0ek0kfcaq3pi/ckpt_epoch200000.pth?dl=0).
+Please download our dataset from [here](https://www.dropbox.com/s/a6nc146y86uvyy9/normalmap.zip?dl=0). Then, change the option "data_root" in both "scripts/train_gan.sh" and "scripts/test_gan.sh" to the directory containing the dataset.
 
 ## Training
 Run the following command to train Roof-GAN:
@@ -39,4 +39,4 @@ The generated models will be saved under "experiments/{proj_dir}/results/". We a
 [https://yi-ming-qian.github.io/](https://yi-ming-qian.github.io/)
 
 ## Acknowledgements
-We thank the authors of [PQ-Net](https://github.com/ChrisWu1997/PQ-NET) and of [House-GAN](https://github.com/ennauata/housegan). Part of our implementation is modified based on their codes.
+We thank the authors of [PQ-Net](https://github.com/ChrisWu1997/PQ-NET) and of [House-GAN](https://github.com/ennauata/housegan). Parts of our implementation are modified based on their codes.
