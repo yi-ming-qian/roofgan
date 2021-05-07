@@ -1,6 +1,6 @@
 # Roof-GAN: Learning to Generate Roof Geometry and Relations for Residential Houses
 
-Code for the [CVPR 2021 paper](https://arxiv.org/abs/2012.09340) by [Yiming Qian](https://yi-ming-qian.github.io/), [Hao Zhang](https://www.cs.sfu.ca/~haoz/), and [Yasutaka Furukawa](https://www.cs.sfu.ca/~furukawa/)
+Code for the [CVPR 2021 paper](https://arxiv.org/abs/2012.09340) by [Yiming Qian](https://yi-ming-qian.github.io/), [Hao Zhang](https://www.cs.sfu.ca/~haoz/), and [Yasutaka Furukawa](https://www.cs.sfu.ca/~furukawa/). Supplementary document is [here](https://drive.google.com/file/d/130p1PjD2OuV6bhYdp8c_QEU6LPbUux8Q/view?usp=sharing).
 
 ## Getting Started
 
