@@ -35,6 +35,7 @@ class HouseDataset(Dataset):
 
         self.transform = phase=="train"
         if exclude==0:
+            # you need to modify this part if you use the split for evaluation
             if phase == "train":
                 all_paths = all_paths[:-64]
                 num_blocks = num_blocks[:-64]

@@ -35,8 +35,19 @@ sh ./scripts/test_gan.sh
 
 The generated models will be saved under "experiments/{proj_dir}/results/". We also provide our pre-trained models [here](https://www.dropbox.com/s/qxt0ek0kfcaq3pi/ckpt_epoch200000.pth?dl=0). To use it, please place it under "experiments/{proj_dir}/model_gan/".
 
+## Evaluation
+Run the following command to evaluate with the RMMD and FID metrics:
+```bash
+cd evaluate
+sh evaluate_RMMD.sh
+cd fid
+sh evaluate_fid.sh
+```
+
+Our generated results can be downloaded from [here](https://www.dropbox.com/s/urkdlznm876drjc/results.zip?dl=0), which should be placed at "experiments/".
+
 ## Contact
 [https://yi-ming-qian.github.io/](https://yi-ming-qian.github.io/)
 
 ## Acknowledgements
-We thank the authors of [PQ-Net](https://github.com/ChrisWu1997/PQ-NET) and of [House-GAN](https://github.com/ennauata/housegan). Parts of our implementation are modified based on their codes.
+We thank the authors of [PQ-Net](https://github.com/ChrisWu1997/PQ-NET) and of [House-GAN](https://github.com/ennauata/housegan). Parts of our implementation are modified based on their codes. The FID metric implmentation is copied from [mseitzer/pytorch-fid](https://github.com/mseitzer/pytorch-fid).
