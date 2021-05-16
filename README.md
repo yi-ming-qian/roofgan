@@ -44,7 +44,7 @@ cd fid
 sh evaluate_fid.sh
 ```
 
-Our generated results can be downloaded from [here](https://www.dropbox.com/s/urkdlznm876drjc/results.zip?dl=0), which should be placed at "experiments/" after un-zipping.
+Our generated results can be downloaded from [here](https://www.dropbox.com/s/urkdlznm876drjc/results.zip?dl=0), which should be placed at "experiments/" after unzipping.
 
 ## Contact
 [https://yi-ming-qian.github.io/](https://yi-ming-qian.github.io/)
