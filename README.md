@@ -36,7 +36,7 @@ sh ./scripts/test_gan.sh
 The generated models will be saved under "experiments/{proj_dir}/results/". We also provide our pre-trained models [here](https://www.dropbox.com/s/qxt0ek0kfcaq3pi/ckpt_epoch200000.pth?dl=0). To use it, please place it under "experiments/{proj_dir}/model_gan/".
 
 ## Evaluation
-Run the following command to evaluate with the RMMD and FID metrics:
+Run the following commands to evaluate with the RMMD and FID metrics:
 ```bash
 cd evaluate
 sh evaluate_RMMD.sh
@@ -44,7 +44,7 @@ cd fid
 sh evaluate_fid.sh
 ```
 
-Our generated results can be downloaded from [here](https://www.dropbox.com/s/urkdlznm876drjc/results.zip?dl=0), which should be placed at "experiments/".
+Our generated results can be downloaded from [here](https://www.dropbox.com/s/urkdlznm876drjc/results.zip?dl=0), which should be placed at "experiments/" after un-zipping.
 
 ## Contact
 [https://yi-ming-qian.github.io/](https://yi-ming-qian.github.io/)
