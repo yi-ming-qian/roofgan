@@ -210,8 +210,8 @@ class WGANAgant(object):
                 self.save_ckpt()
 
     def generate(self, config):
-        # np.random.seed(0)
-        # torch.manual_seed(0)
+        np.random.seed(0)
+        torch.manual_seed(0)
         
         self.eval()
         save_dir = os.path.join(config.exp_dir, "results/ckpt-{}-num-{}".format(config.ckpt, config.n_samples))
@@ -313,7 +313,7 @@ class WGANAgant(object):
         height_map, face_masks, segment_img, normal_img = house.rasterize_house(scale_flag=True)
         cv2.imwrite(save_dir+"_graph.png", segment_img)
         cv2.imwrite(save_dir+"_normal_graph.png", normal_img)
-        #np.savez(save_dir + f'_graph.npz', height_map=height_map, face_masks=face_masks, num_blocks=n_blocks_save)
+        np.savez(save_dir + f'_graph.npz', height_map=height_map, face_masks=face_masks, num_blocks=n_blocks_save)
         house.save_to_mesh(save_dir+"_graph.obj")
         
         return True
