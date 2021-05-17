@@ -31,22 +31,30 @@ class HouseDataset(Dataset):
                     line = line.strip()
                     num_blocks.append(int(line))
                     break
-        num_blocks = np.asarray(num_blocks) 
+        num_blocks = np.asarray(num_blocks)
 
         self.transform = phase=="train"
         if exclude==0:
-            # you need to modify this part if you use the split for evaluation
+            test_names = []
+            with open("./dataset/gt_test_list.txt","r") as f:
+                for line in f:
+                    line = line.strip()
+                    test_names.append(line)
+            flag = np.full(len(all_paths),False)
+            for i, path in enumerate(all_paths):
+                path = path.split('/')
+                if path[-3]+'/'+path[-2]+'/'+path[-1] in test_names:
+                    flag[i] = True
+
             if phase == "train":
-                all_paths = all_paths[:-64]
-                num_blocks = num_blocks[:-64]
+                all_paths = all_paths[np.logical_not(flag)]
             elif phase == "test":
-                all_paths = all_paths[-64:]
+                all_paths = all_paths[flag]
             else:
-                all_paths = all_paths[:-64]
+                all_paths = all_paths[np.logical_not(flag)]
         else:
             if phase == "train":
                 flag = num_blocks!=exclude
-                num_blocks = num_blocks[flag]
             elif phase == "test":
                 flag = num_blocks==exclude
             else:
